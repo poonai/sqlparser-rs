@@ -524,7 +524,10 @@ impl<'a> Parser<'a> {
             }
             Token::Dollar if dialect_of!(self is PostgreSqlDialect) => {
                 // Postgres user defined variables starts with $
-                let name = self.parse_identifier()?;
+                let name = match self.next_token() {
+                    Token::Number(number, _) => Ident::new(number),
+                    tok => {return parser_err!(format!("expected identifier but found {}", tok))}
+                };
                 Ok(Expr::SqlVariable { prefix: '$', name })
             }
             unexpected => self.expected("an expression:", unexpected),
