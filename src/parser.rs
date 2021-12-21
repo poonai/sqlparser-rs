@@ -492,14 +492,34 @@ impl<'a> Parser<'a> {
             }
 
             Token::LParen => {
-                let expr =
+                let mut expr =
                     if self.parse_keyword(Keyword::SELECT) || self.parse_keyword(Keyword::WITH) {
                         self.prev_token();
                         Expr::Subquery(Box::new(self.parse_query()?))
                     } else {
-                        Expr::Nested(Box::new(self.parse_expr()?))
+                        self.parse_expr()?
                     };
                 self.expect_token(&Token::RParen)?;
+                expr = match expr {
+                    Expr::Function(_) => {
+                        if !self.consume_token(&Token::Period) {
+                            return Ok(Expr::Nested(Box::new(expr)));
+                        }
+                        let tok = self.next_token();
+                        let identifier = match tok {
+                            Token::Word(word) => Expr::Identifier(word.to_ident()),
+                            _ => {
+                                return parser_err!(format!("Expected identifier, found: {}", tok))
+                            }
+                        };
+                        Expr::Nested(Box::new(Expr::MapAccess {
+                            column: Box::new(expr),
+                            keys: vec![identifier],
+                        }))
+                    }
+                    Expr::Subquery(_) => expr,
+                    _ => Expr::Nested(Box::new(expr)),
+                };
                 Ok(expr)
             }
             Token::Dollar if dialect_of!(self is PostgreSqlDialect) => {
