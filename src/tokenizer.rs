@@ -139,6 +139,8 @@ pub enum Token {
     PGSquareRoot,
     /// `||/` , a cube root math operator in PostgreSQL
     PGCubeRoot,
+     /// Dollar sign `$`
+     Dollar,
 }
 
 impl fmt::Display for Token {
@@ -194,6 +196,7 @@ impl fmt::Display for Token {
             Token::ShiftRight => f.write_str(">>"),
             Token::PGSquareRoot => f.write_str("|/"),
             Token::PGCubeRoot => f.write_str("||/"),
+            Token::Dollar => f.write_str("$"),
         }
     }
 }
@@ -596,6 +599,7 @@ impl<'a> Tokenizer<'a> {
                 }
                 '#' => self.consume_and_return(chars, Token::Sharp),
                 '@' => self.consume_and_return(chars, Token::AtSign),
+                '$' => self.consume_and_return(chars, Token::Dollar),
                 other => self.consume_and_return(chars, Token::Char(other)),
             },
             None => Ok(None),
