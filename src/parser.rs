@@ -497,7 +497,30 @@ impl<'a> Parser<'a> {
                         self.prev_token();
                         Expr::Subquery(Box::new(self.parse_query()?))
                     } else {
-                        Expr::Nested(Box::new(self.parse_expr()?))
+                        let expr = self.parse_expr()?;
+                        match expr {
+                            Expr::Function(_) => {
+                                if !self.consume_token(&Token::Period) {
+                                    return Ok(Expr::Nested(Box::new(expr)));
+                                }
+                                let tok = self.next_token();
+                                let identifier = match tok {
+                                    Token::Word(word) => {
+                                        return Ok(Expr::MapAccess {
+                                            column: Box::new(expr),
+                                            keys: vec![Expr::Identifier(word.to_ident())],
+                                        })
+                                    }
+                                    _ => {
+                                        return parser_err!(format!(
+                                            "Expected identifier, found: {}",
+                                            tok
+                                        ))
+                                    }
+                                };
+                            }
+                            _ => Expr::Nested(Box::new(expr)),
+                        }
                     };
                 self.expect_token(&Token::RParen)?;
                 Ok(expr)
