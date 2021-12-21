@@ -501,7 +501,7 @@ impl<'a> Parser<'a> {
                     };
                 self.expect_token(&Token::RParen)?;
                 expr = match expr {
-                    Expr::Function(_) => {
+                    Expr::Function(_) | Expr::Identifier(_) | Expr::CompoundIdentifier(_) => {
                         if !self.consume_token(&Token::Period) {
                             return Ok(Expr::Nested(Box::new(expr)));
                         }
