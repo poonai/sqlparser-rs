@@ -507,15 +507,15 @@ impl<'a> Parser<'a> {
                         }
                         let tok = self.next_token();
                         let identifier = match tok {
-                            Token::Word(word) => Expr::Identifier(word.to_ident()),
+                            Token::Word(word) => word.to_ident(),
                             _ => {
                                 return parser_err!(format!("Expected identifier, found: {}", tok))
                             }
                         };
-                        Expr::Nested(Box::new(Expr::MapAccess {
-                            column: Box::new(expr),
-                            keys: vec![identifier],
-                        }))
+                        Expr::TableColumnAccess {
+                            expr: Box::new(expr),
+                            column: identifier,
+                        }
                     }
                     Expr::Subquery(_) => expr,
                     _ => Expr::Nested(Box::new(expr)),
@@ -526,7 +526,7 @@ impl<'a> Parser<'a> {
                 // Postgres user defined variables starts with $
                 let name = match self.next_token() {
                     Token::Number(number, _) => Ident::new(number),
-                    tok => {return parser_err!(format!("expected identifier but found {}", tok))}
+                    tok => return parser_err!(format!("expected identifier but found {}", tok)),
                 };
                 Ok(Expr::SqlVariable { prefix: '$', name })
             }

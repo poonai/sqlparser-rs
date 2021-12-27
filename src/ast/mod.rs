@@ -281,6 +281,11 @@ pub enum Expr {
     /// - Mysql: https://dev.mysql.com/doc/refman/8.0/en/user-variables.html
     /// - Snowflake: https://docs.snowflake.com/en/sql-reference/session-variables.html
     SqlVariable { prefix: char, name: Ident },
+
+    TableColumnAccess {
+        expr: Box<Expr>,
+        column: Ident,
+    }
 }
 
 impl fmt::Display for Expr {
@@ -442,6 +447,7 @@ impl fmt::Display for Expr {
                 write!(f, "ARRAY[{}]", display_comma_separated(exprs))
             }
             Expr::SqlVariable { prefix, name } => write!(f, "{}{}", prefix, name),
+            Expr::TableColumnAccess{expr, column} => write!(f, "({}).{}", expr, column)
         }
     }
 }
