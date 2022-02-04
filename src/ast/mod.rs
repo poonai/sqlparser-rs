@@ -1086,23 +1086,23 @@ impl fmt::Display for Statement {
                 if *csv_header {
                     write!(f, " CSV HEADER")?;
                 }
-                if !values.is_empty() {
-                    write!(f, ";")?;
-                    writeln!(f)?;
-                    let mut delim = "";
-                    for v in values {
-                        write!(f, "{}", delim)?;
-                        delim = "\t";
-                        if let Some(v) = v {
-                            write!(f, "{}", v)?;
-                        } else {
-                            write!(f, "\\N")?;
-                        }
-                    }
-                }
-                if filename.is_none() {
-                    write!(f, "\n\\.")?;
-                }
+                // if !values.is_empty() {
+                //     write!(f, ";")?;
+                //     writeln!(f)?;
+                //     let mut delim = "";
+                //     for v in values {
+                //         write!(f, "{}", delim)?;
+                //         delim = "\t";
+                //         if let Some(v) = v {
+                //             write!(f, "{}", v)?;
+                //         } else {
+                //             write!(f, "\\N")?;
+                //         }
+                //     }
+                // }
+                // if filename.is_none() {
+                //     write!(f, "\n\\.")?;
+                // }
                 Ok(())
             }
             Statement::Update {
