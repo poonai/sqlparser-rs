@@ -2127,11 +2127,11 @@ impl<'a> Parser<'a> {
             break;
         }
         // copy the values from stdin if there is no file to be copied from.
-        let mut values = vec![];
-        if filename.is_none() {
-            self.expect_token(&Token::SemiColon)?;
-            values = self.parse_tsv();
-        }
+        let values = vec![];
+        // if filename.is_none() {
+        //     self.expect_token(&Token::SemiColon)?;
+        //     values = self.parse_tsv();
+        // }
         Ok(Statement::Copy {
             table_name,
             columns,
