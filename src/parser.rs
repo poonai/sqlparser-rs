@@ -3547,6 +3547,7 @@ impl<'a> Parser<'a> {
     pub fn parse_start_transaction(&mut self) -> Result<Statement, ParserError> {
         self.expect_keyword(Keyword::TRANSACTION)?;
         Ok(Statement::StartTransaction {
+            begin_mode: false,
             modes: self.parse_transaction_modes()?,
         })
     }
@@ -3554,6 +3555,7 @@ impl<'a> Parser<'a> {
     pub fn parse_begin(&mut self) -> Result<Statement, ParserError> {
         let _ = self.parse_one_of_keywords(&[Keyword::TRANSACTION, Keyword::WORK]);
         Ok(Statement::StartTransaction {
+            begin_mode: true,
             modes: self.parse_transaction_modes()?,
         })
     }

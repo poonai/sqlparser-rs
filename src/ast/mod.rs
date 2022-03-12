@@ -810,7 +810,7 @@ pub enum Statement {
         filter: Option<ShowStatementFilter>,
     },
     /// `{ BEGIN [ TRANSACTION | WORK ] | START TRANSACTION } ...`
-    StartTransaction { modes: Vec<TransactionMode> },
+    StartTransaction { modes: Vec<TransactionMode>, begin_mode: bool },
     /// `SET TRANSACTION ...`
     SetTransaction {
         modes: Vec<TransactionMode>,
@@ -1418,8 +1418,13 @@ impl fmt::Display for Statement {
                 }
                 Ok(())
             }
-            Statement::StartTransaction { modes } => {
-                write!(f, "START TRANSACTION")?;
+            Statement::StartTransaction { modes , begin_mode} => {
+                if *begin_mode{
+                    write!(f, "BEGIN")?;
+                } else {
+                    write!(f, "START TRANSACTION")?;
+                }
+                
                 if !modes.is_empty() {
                     write!(f, " {}", display_comma_separated(modes))?;
                 }
